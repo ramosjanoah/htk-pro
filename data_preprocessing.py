@@ -218,8 +218,8 @@ def saveStr(instr,outfile):
 	file.close()
 
 #SET INI!!
-folder_dataset = "F:/Sashi/Kuliah S1/SEM7/NLP/IF4072 Tugas Besar Speech2/Dataset/" #Tempat nyimpen dataset tubes atau folder set_
-folder_transcript = "F:/Sashi/Kuliah S1/SEM7/NLP/IF4072 Tugas Besar Speech2/Dataset/transcript/" #Tempat nyimpen data" transkrip
+folder_dataset = "/root/Downloads/IF4072 Tugas Besar Speech/Dataset/" #Tempat nyimpen dataset tubes atau folder set_
+folder_transcript = "/root/Downloads/IF4072 Tugas Besar Speech/Dataset/transcript/" #Tempat nyimpen data" transkrip
 #
 
 extractPhonemeSet(readTranskrip(folder_transcript+'A-raw.tsv'))
