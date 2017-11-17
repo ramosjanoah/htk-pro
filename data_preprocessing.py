@@ -258,4 +258,5 @@ saveStr(mlf_word,"words.mlf")
 #Generate dictionary "dict"
 os.system("HDMan -m -w wlist -n monophones1 -l dlog dict dict_phoneme")
 #Generate phones0.mlf
-os.system("HLEd -l '*' -d dict -i phones0.mlf mkphones0.led words.mlf")
+os.system("HLEd -d dict -X wav -i phones0.mlf mkphones0.led words.mlf")
+
