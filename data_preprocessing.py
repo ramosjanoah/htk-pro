@@ -259,3 +259,7 @@ saveStr(mlf_word,"words.mlf")
 os.system("HDMan -m -w wlist -n monophones1 -l dlog dict dict_phoneme")
 #Generate phones0.mlf
 os.system("HLEd -d dict -X wav -i phones0.mlf mkphones0.led words.mlf")
+<<<<<<< HEAD
+=======
+
+>>>>>>> d9950539a97d244c324e825de48a6f879ecf69dd
