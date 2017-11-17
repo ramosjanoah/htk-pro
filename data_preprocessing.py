@@ -218,8 +218,8 @@ def saveStr(instr,outfile):
 	file.close()
 
 #SET INI!!
-folder_dataset = "/root/Downloads/IF4072 Tugas Besar Speech/Dataset/" #Tempat nyimpen dataset tubes atau folder set_
-folder_transcript = "/root/Downloads/IF4072 Tugas Besar Speech/Dataset/transcript/" #Tempat nyimpen data" transkrip
+folder_dataset = "/root/Downloads/IF/Dataset/" #Tempat nyimpen dataset tubes atau folder set_
+folder_transcript = "/root/Downloads/IF/Dataset/transcript/" #Tempat nyimpen data" transkrip
 #
 
 extractPhonemeSet(readTranskrip(folder_transcript+'A-raw.tsv'))
@@ -258,4 +258,4 @@ saveStr(mlf_word,"words.mlf")
 #Generate dictionary "dict"
 os.system("HDMan -m -w wlist -n monophones1 -l dlog dict dict_phoneme")
 #Generate phones0.mlf
-os.system("HLEd -l '*' -d dict -i phones0.mlf mkphones0.led words.mlf")
+os.system("HLEd -d dict -X wav -i phones0.mlf mkphones0.led words.mlf")
