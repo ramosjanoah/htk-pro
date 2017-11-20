@@ -268,6 +268,7 @@ def saveStr(instr,outfile):
 	file.write(instr)
 	file.close()
 
+
 def combine_transcript(folder_transcript):
 	transcript_list = os.listdir(folder_transcript)
 	transcript_list = [trans for trans in transcript_list if "-raw.tsv" in trans]
@@ -288,6 +289,7 @@ def combine_audio_folder(folder_dataset,folder_target):
 
 			for wav in wav_list:
 				shutil.copy((set_folder+"/"+sub_set+"/"+wav),folder_target)
+
 
 extractPhonemeSet(readTranskrip(folder_transcript+'A-raw.tsv'))
 extractPhonemeSet(readTranskrip(folder_transcript+'B-raw.tsv'))
