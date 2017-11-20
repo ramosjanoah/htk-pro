@@ -2,10 +2,14 @@ import sys
 import io
 import re
 import os
+import shutil
 
 list_word = []
 list_phoneme_seq = []
 mlf_word = ""
+#SET INI!!
+folder_dataset = "F:/Sashi/Kuliah S1/SEM7/NLP/IF4072 Tugas Besar Speech2/Dataset/" #Tempat nyimpen dataset tubes atau folder set_
+folder_transcript = "F:/Sashi/Kuliah S1/SEM7/NLP/IF4072 Tugas Besar Speech2/Dataset/transcript/" #Tempat nyimpen data" transkrip
 
 def readTranskrip(infile):
 	print(infile)
@@ -20,6 +24,10 @@ def readTranskrip(infile):
 			word = word.replace("  "," ")
 		
 		return word
+
+def readTranskrip_raw(infile):
+	with open(infile,'r') as myfile:
+		return myfile.read()
 
 def extractPhonemeSet(raw_transcript): 
 	while(raw_transcript[-1]=='\n'):
@@ -124,7 +132,7 @@ def phonemeSeqGenetor(word):
 			elif word[idx]=='p':
 				phonem_seq+='p '
 			elif word[idx]=='q':
-				phonem_seq+='q '
+				phonem_seq+='k '
 			elif word[idx]=='r':
 				phonem_seq+='r '
 			elif word[idx]=='s':
@@ -140,7 +148,10 @@ def phonemeSeqGenetor(word):
 			elif word[idx]=='z':
 				phonem_seq+='z '
 			elif word[idx]=='x':
-				phonem_seq+="k s "
+				if idx==0:
+					phonem_seq+= "s "
+				else:
+					phonem_seq+="k s "
 			elif word[idx]=='-' or word[idx]=='\'':
 				phonem_seq+=''
 			else:
@@ -191,6 +202,46 @@ def crawlFile(uttr_code,forlder_list):
 		idf +=1
 	return addr
 
+def search_transcript(wav,folder_transcript):
+
+	transcript_code = wav.replace(".wav","")[-4:]
+	transcript_list = readTranskrip(folder_transcript+transcript_code[0]+"-raw.tsv").lower().split("\n")
+	transcript = [trans for trans in transcript_list if ("_"+transcript_code[1:]) in trans][0]
+	if len(transcript)>4:
+		return transcript.split("\t")[1]
+	else:
+		return ""
+
+def generateMLF_word_audio_based(folder_dataset, folder_transcript):
+	mlf_word = ""
+	folder_list = listFolder(folder_dataset,"set_")
+	#root folder leve
+	for set_folder in folder_list:
+		#in set_ folder
+		sub_set_list = os.listdir(set_folder)
+		for sub_set in sub_set_list:
+			wav_list = os.listdir(set_folder+sub_set)
+			wav_list = [wav for wav in wav_list if '.wav' in wav and ' ' not in wav]
+
+			for wav in wav_list:
+				print(wav)
+				transcript = search_transcript(wav,folder_transcript)
+				if len(transcript)>4:
+					mlf_word+= "\""+set_folder+"/"+sub_set+"/"+wav+"\"\n"
+					words = transcript.split(" ")
+					for word in words:
+						if '-' not in word:
+							mlf_word+=word+"\n"
+						else:
+							rep_word = word.split("-")
+							if rep_word[0]==rep_word[1]:
+								mlf_word+=rep_word[0]+"\n"+rep_word[1]+"\n"
+							else:
+								mlf_word+=word+"\n"
+					mlf_word+='.\n'
+
+	return mlf_word
+
 def generateMLF_word(transcript_file,code):
 	mlf_word = ""
 	transcript_list = readTranskrip(transcript_file).lower().split("\n")
@@ -217,10 +268,26 @@ def saveStr(instr,outfile):
 	file.write(instr)
 	file.close()
 
-#SET INI!!
-folder_dataset = "F:/Sashi/Kuliah S1/SEM7/NLP/IF4072 Tugas Besar Speech2/Dataset/" #Tempat nyimpen dataset tubes atau folder set_
-folder_transcript = "F:/Sashi/Kuliah S1/SEM7/NLP/IF4072 Tugas Besar Speech2/Dataset/transcript/" #Tempat nyimpen data" transkrip
-#
+def combine_transcript(folder_transcript):
+	transcript_list = os.listdir(folder_transcript)
+	transcript_list = [trans for trans in transcript_list if "-raw.tsv" in trans]
+	comb_trans = ""
+	for trans in transcript_list:
+		comb_trans+=readTranskrip_raw(folder_transcript+trans)
+	saveStr(comb_trans,'all_transcript.tsv')
+
+def combine_audio_folder(folder_dataset,folder_target):
+	folder_list = listFolder(folder_dataset,"set_")
+	#root folder leve
+	for set_folder in folder_list:
+		#in set_ folder
+		sub_set_list = os.listdir(set_folder)
+		for sub_set in sub_set_list:
+			wav_list = os.listdir(set_folder+sub_set)
+			wav_list = [wav for wav in wav_list if '.wav' in wav]
+
+			for wav in wav_list:
+				shutil.copy((set_folder+"/"+sub_set+"/"+wav),folder_target)
 
 extractPhonemeSet(readTranskrip(folder_transcript+'A-raw.tsv'))
 extractPhonemeSet(readTranskrip(folder_transcript+'B-raw.tsv'))
@@ -249,6 +316,8 @@ mlf_word += generateMLF_word(folder_transcript+"H-raw.tsv",'H')
 mlf_word += generateMLF_word(folder_transcript+"I-raw.tsv",'I')
 mlf_word += generateMLF_word(folder_transcript+"J-raw.tsv",'J')
 
+
+mlf_word=generateMLF_word_audio_based(folder_dataset, folder_transcript)
 #Save words.mlf
 while "\n\n" in mlf_word:
 	mlf_word = mlf_word.replace("\n\n","\n")
@@ -258,4 +327,4 @@ saveStr(mlf_word,"words.mlf")
 #Generate dictionary "dict"
 os.system("HDMan -m -w wlist -n monophones1 -l dlog dict dict_phoneme")
 #Generate phones0.mlf
-os.system("HLEd -l '*' -d dict -i phones0.mlf mkphones0.led words.mlf")
+os.system("HLEd -d dict -X wav -i phones0.mlf mkphones0.led words.mlf")
